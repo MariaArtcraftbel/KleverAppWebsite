@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Клевер — Управление видеозаписями</title>
+  
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <!-- AOS CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+  <style>
+    /* Стили для модальных окон */
+    .modal {
+      transition: opacity 0.25s ease;
+      z-index: 50;
+    }
+    .modal-content {
+      max-height: calc(100vh - 100px);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-body {
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .modal-active {
+      overflow: hidden;
+    }
+    
+    /* Дополнительный стиль для плавного скроллинга */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Стили для карусели */
+    .carousel-container {
+      overflow: hidden;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .carousel-item {
+      min-width: 100%;
+      flex-shrink: 0;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .carousel-item img {
+      width: 100%;
+      max-width: 600px;
+      height: 350px;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .carousel-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .prev { left: 10px; }
+    .next { right: 10px; }
+    .carousel-caption {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Шапка -->
+  <header class="bg-green-600 text-white py-6" data-aos="fade-down">
+    <div class="container mx-auto px-6">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown">Клевер — Управление видеозаписями</h1>
+      <p class="mt-2 text-lg sm:text-xl animate__animated animate__fadeInDown">Автоматическое копирование видео с USB-дисков</p>
+    </div>
+  </header>
+
+  <!-- Блок "Что умеет" -->
+  <section class="py-12 bg-white" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+      <h2 class="text-2xl font-bold mb-6 text-center">Что умеет «Клевер»?</h2>
+      <ul class="list-disc pl-6 space-y-2 max-w-3xl mx-auto text-lg">
+        <li>Автоматически находит подключённые USB-накопители (флешки, внешние диски)</li>
+        <li>Ищет видеофайлы (.mp4, .avi, .mov, .mkv) по заданным расширениям</li>
+        <li>Сортирует и копирует видео по дате создания и устройству</li>
+        <li>Создаёт папки автоматически с учётом даты и имени устройства</li>
+        <li>Поддержка ручной и автоматической очистки дисков (по заполненности)</li>
+        <li>Оповещение при переполнении памяти на накопителе</li>
+        <li>Пробный период 5 дней без ограничений</li>
+        <li>Платная активация через код</li>
+        <li>Интерфейс с прогресс-барами, логами и статусами устройств</li>
+        <li>Встроенный файловый менеджер для просмотра записей</li>
+        <li>Поддержка запуска на Windows (рекомендуется 10/11)</li>
+        <li>Скрытая работа — приложение можно свернуть в трей</li>
+        <li>Блокировка / разблокировка дисков вручную</li>
+        <li>Простая установка</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Галерея скриншотов (карусель) -->
+  <section class="py-12 bg-gray-50" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+      <h2 class="text-2xl font-bold text-center mb-6">Как выглядит приложение</h2>
+      <div class="carousel-container">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-item">
+            <img src="images/screenshot1.png" alt="Главный экран">
+            <p class="carousel-caption">Главный экран — просмотр и подключение устройств</p>
+          </div>
+          <div class="carousel-item">
+            <img src="images/screenshot2.png" alt="Файловый менеджер">
+            <p class="carousel-caption">Файловый менеджер для просмотра сохранённых видео</p>
+          </div>
+          <div class="carousel-item">
+            <img src="images/screenshot3.png" alt="Очистка диска">
+            <p class="carousel-caption">Очистка переполненного диска</p>
+          </div>
+        </div>
+        <button class="carousel-nav prev">❮</button>
+        <button class="carousel-nav next">❯</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Блок "Скачать" -->
+  <section class="py-12 bg-gray-100" data-aos="fade-up">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-2xl font-bold mb-4">Скачать и начать использовать</h2>
+      <p class="mb-6">Программа работает на Windows. Распакуйте архив и запустите <code>.exe</code>.</p>
+      <a href="files/Klever.zip" download class="bg-green-600 text-white px-8 py-3 rounded text-lg shadow hover:bg-green-700 transition duration-300 ease-in-out animate__animated animate__fadeInUp">
+        Скачать приложение
+      </a>
+      <p class="mt-4"><a href="#licenseModal" class="text-green-600 underline" onclick="showLicense()">Лицензионное соглашение</a></p>
+    </div>
+  </section>
+
+  <!-- Блок "Тарифы" -->
+  <section class="py-12" data-aos="fade-up">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-2xl font-bold mb-4">Тарифы</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Бесплатный тариф: Пробный период -->
+        <div class="bg-white p-6 rounded-lg shadow animate__animated animate__zoomIn">
+          <h3 class="text-xl font-semibold mb-2">Пробный период</h3>
+          <p class="text-gray-600 mb-4">5 дней бесплатно</p>
+          <p class="text-lg font-bold">0 ₽</p>
+        </div>
+        <!-- Платный тариф -->
+        <div class="bg-white p-6 rounded-lg shadow border-2 border-green-500 animate__animated animate__zoomIn">
+          <h3 class="text-xl font-semibold mb-2">Покупка приложения</h3>
+          <p class="text-gray-600 mb-4">Полный функционал</p>
+          <p class="text-lg font-bold">999 ₽</p>
+          <button id="buyBtn" class="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition duration-300 ease-in-out animate__animated animate__pulse">
+            Купить приложение
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Блок "Как работает" -->
+  <section class="py-12 bg-white" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+      <h2 class="text-2xl font-bold mb-6 text-center">Как работает «Клевер» — пошаговая инструкция</h2>
+      <div class="space-y-6 text-lg leading-relaxed max-w-4xl mx-auto text-left">
+        <div>
+          <h3 class="font-semibold text-xl mb-2">1. Скачайте и запустите приложение</h3>
+          <p>Скачайте архив с программой по кнопке выше, распакуйте и запустите файл <code>.exe</code>. При первом запуске начинается 5-дневный пробный период.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-xl mb-2">2. Подключите USB-накопитель</h3>
+          <p>Программа автоматически определит подключённый накопитель (флешку, внешний диск). При этом будет показан список доступных устройств и файлов.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-xl mb-2">3. Добавьте новое устройство</h3>
+          <p>В интерфейсе нажмите <strong>«Добавить устройство»</strong>, введите его имя (например, «Toyota Cam 001»). Это имя будет использоваться для сортировки видео по папкам.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-xl mb-2">4. Копирование файлов</h3>
+          <p>Программа находит видеофайлы на накопителе, сортирует их по дате и копирует в папку, соответствующую выбранному устройству. Вы увидите ход копирования через прогрессбар.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-xl mb-2">5. Очистка и блокировка диска</h3>
+          <p>Если диск переполнен, программа предложит удалить старые файлы. Также вы можете вручную заблокировать диск, чтобы избежать случайных действий.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-xl mb-2">6. Просмотр файлов</h3>
+          <p>Через встроенный файловый менеджер можно просматривать скопированные видео, открывать папки и проверять сохранённые записи.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-xl mb-2">7. Активация</h3>
+          <p>После окончания пробного периода программа предложит ввести код активации. Инструкция будет показана в отдельном окне при нажатии на кнопку "купить приложение".</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Модальное окно для оплаты -->
+  <div id="buyModal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 pointer-events-none">
+    <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2 modal-content" data-aos="zoom-in">
+      <div class="modal-body">
+        <h2 class="text-2xl font-bold mb-4">Информация об оплате</h2>
+        <p class="mb-2"><strong>Яндекс Кошелёк:</strong> <span class="text-green-600">4100 1505 2029 681</span></p>
+        <p class="mb-2"><strong>Email для чеков:</strong> <span class="text-green-600">artcraftbel@yandex.by</span></p>
+        <p class="mb-2"><strong>Сумма к оплате:</strong> 999 рублей</p>
+        <p class="mb-2"><strong>Порядок оплаты:</strong></p>
+        <ol class="list-decimal pl-5 mb-4 text-left">
+          <li>Переведите 999 рублей на указанный Яндекс Кошелёк</li>
+          <li>Отправьте чек об оплате на email: <strong>artcraftbel@yandex.by</strong></li>
+          <li>Скачайте приложение</li>
+          <li>Ожидайте код активации на ваш email (не более 12 часов)</li>
+        </ol>
+      </div>
+      <button id="closeModal" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 ease-in-out">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
+  <!-- Модальное окно лицензионного соглашения -->
+  <div id="licenseModal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 pointer-events-none">
+    <div class="bg-white p-6 rounded-lg w-11/12 md:w-3/4 modal-content">
+      <h2 class="text-2xl font-bold mb-4">Лицензионное соглашение</h2>
+      <div class="modal-body text-sm space-y-4">
+        <h3 class="text-lg font-semibold">1. Общие положения</h3>
+        <p>1.1. Нажимая кнопку «Скачать приложение» или «Купить приложение», вы подтверждаете, что ознакомились с условиями настоящего соглашения и принимаете их безоговорочно.</p>
+        <p>1.2. Приложение «Клевер» предоставляется «как есть». Разработчик (Art_craft_bel) не гарантирует бесперебойную работу программы и не несет ответственности за косвенные убытки.</p>
+
+        <h3 class="text-lg font-semibold">2. Условия использования</h3>
+        <p>2.1. Пользователь обязуется:</p>
+        <ul class="list-disc pl-5">
+          <li>Использовать приложение только в законных целях.</li>
+          <li>Не модифицировать, не распространять и не декомпилировать код без письменного согласия разработчика.</li>
+        </ul>
+        <p>2.2. Пробный период (5 дней) предоставляется для тестирования. По его окончании функционал блокируется до покупки лицензии.</p>
+
+        <h3 class="text-lg font-semibold">3. Оплата и возврат</h3>
+        <p>3.1. Оплата (999 ₽) осуществляется через Яндекс Кошелёк. Возврат средств возможен только при технической невозможности запуска приложения на вашем ПК (требуется доказательство).</p>
+        <p>3.2. После оплаты код активации отправляется на email в течение 12 часов. Претензии по задержке принимаются только через 24 часа.</p>
+
+        <h3 class="text-lg font-semibold">4. Ответственность</h3>
+        <p>4.1. Разработчик не отвечает за:</p>
+        <ul class="list-disc pl-5">
+          <li>Потерю данных при автоматической очистке дисков.</li>
+          <li>Некорректную работу приложения на неподдерживаемых версиях ОС.</li>
+          <li>Использование приложения с нарушением инструкций.</li>
+        </ul>
+
+        <h3 class="text-lg font-semibold">5. Заключительные положения</h3>
+        <p>5.1. Все споры решаются в соответствии с законодательством Республики Беларусь.</p>
+        <p>5.2. Контакты для претензий: artcraftbel@yandex.by.</p>
+      </div>
+      <button onclick="closeLicense()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 ease-in-out">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
+  <!-- Футер -->
+  <footer class="bg-gray-800 text-white py-6" data-aos="fade-up">
+    <div class="container mx-auto px-6 text-center">
+      <p>&copy; 2025 Art_craft_bel. Все права защищены.</p>
+      <p>УНП СЕ6160543</p>
+      <p class="mt-2">По вопросам и предложениям: <a href="mailto:artcraftbel@yandex.by" class="underline">artcraftbel@yandex.by</a></p>
+      <div class="mt-4">
+        <a href="https://www.instagram.com/art_craft_bel" target="_blank" class="inline-block mx-2 text-white hover:text-green-400 transition duration-300">
+          Instagram: @art_craft_bel
+        </a>
+      </div>
+      <div id="counter" class="mt-4 text-sm">
+        <script>
+          if(localStorage.pagecount) localStorage.pagecount = Number(localStorage.pagecount)+1;
+          else localStorage.pagecount = 1;
+          document.write('Посещений: '+ localStorage.pagecount);
+        </script>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Скрипт для управления модальными окнами -->
+  <script>
+    // Управление окном оплаты
+    const buyBtn = document.getElementById('buyBtn');
+    const closeModal = document.getElementById('closeModal');
+    const buyModal = document.getElementById('buyModal');
+
+    buyBtn.addEventListener('click', () => {
+      buyModal.classList.remove('opacity-0', 'pointer-events-none');
+      buyModal.classList.add('opacity-100');
+      document.body.classList.add('modal-active');
+    });
+
+    closeModal.addEventListener('click', () => {
+      buyModal.classList.add('opacity-0', 'pointer-events-none');
+      buyModal.classList.remove('opacity-100');
+      document.body.classList.remove('modal-active');
+    });
+
+    // Управление окном лицензии
+    function showLicense() {
+      document.getElementById('licenseModal').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('licenseModal').classList.add('opacity-100');
+      document.body.classList.add('modal-active');
+    }
+
+    function closeLicense() {
+      document.getElementById('licenseModal').classList.add('opacity-0', 'pointer-events-none');
+      document.getElementById('licenseModal').classList.remove('opacity-100');
+      document.body.classList.remove('modal-active');
+    }
+
+    // Закрытие окон по клику вне контента
+    window.addEventListener('click', (e) => {
+      if (e.target === buyModal) {
+        buyModal.classList.add('opacity-0', 'pointer-events-none');
+        buyModal.classList.remove('opacity-100');
+        document.body.classList.remove('modal-active');
+      }
+      if (e.target === document.getElementById('licenseModal')) {
+        closeLicense();
+      }
+    });
+
+    // Скрипт для карусели
+    const track = document.getElementById('carouselTrack');
+    const items = document.querySelectorAll('.carousel-item');
+    const prevBtn = document.querySelector('.prev');
+    const nextBtn = document.querySelector('.next');
+    let currentIndex = 0;
+
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % items.length;
+      updateCarousel();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      updateCarousel();
+    });
+
+    // Автопрокрутка карусели (опционально)
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % items.length;
+      updateCarousel();
+    }, 5000);
+  </script>
+
+  <!-- Скрипты AOS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true
+    });
+  </script>
+  
+</body>
+</html>
